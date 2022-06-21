@@ -1,0 +1,11 @@
+C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\bin\Debug\Frequency Counter Capture.exe.config
+C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\bin\Debug\Frequency Counter Capture.exe
+C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\bin\Debug\Frequency Counter Capture.pdb
+C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.csprojAssemblyReference.cache
+C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.csproj.ResolveComReference.cache
+C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\obj\Debug\Frequency_Counter_Capture.Properties.Resources.resources
+C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.csproj.GenerateResource.cache
+C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.csproj.CoreCompileInputs.cache
+C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.exe
+C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.pdb
+C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\obj\Debug\Frequency_Counter_Capture.MainForm.resources
