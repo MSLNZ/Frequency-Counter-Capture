@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
+using System.IO;
 
 namespace Frequency_Counter_Capture
 {
@@ -13,6 +15,8 @@ namespace Frequency_Counter_Capture
         private long num_100ms = 10000;
         private long num_1000ms = 1000;
         private long num_10000ms = 100;
+        private int exp_freq = 30;
+        private StreamWriter writer = null;
         private static Object lockthis = new Object();
         private bool running_state = false;
         bool skip = false;
@@ -24,14 +28,14 @@ namespace Frequency_Counter_Capture
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public Measurement(ref HP53132A frequency_counter,ref PrintFrequencies print_)
+        public Measurement(ref HP53132A frequency_counter, ref PrintFrequencies print_)
         {
             data = print_;
             hp53132a = frequency_counter;
             encoding = new ASCIIEncoding();
-            
+
         }
-      
+
 
         //Measurements have a frequency counter type
 
@@ -48,7 +52,7 @@ namespace Frequency_Counter_Capture
             {
                 num_100ms = value;
             }
-            
+
         }
 
         public long num1000
@@ -77,6 +81,12 @@ namespace Frequency_Counter_Capture
 
         }
 
+        public int ExpectedFrequency
+        {
+            get { return exp_freq; }
+            set { exp_freq = value; }
+        }
+
         public bool isrunning
         {
             get
@@ -93,53 +103,10 @@ namespace Frequency_Counter_Capture
         {
             hp53132a.doCapture(ref cap_dat);
 
-            //if we done have a + and the start of the string that means we got some rubbish appended to the start
-            int plus_index = cap_dat.IndexOf('+');
-
-            //remove the prefix nonsense
-            try
-            {
-                cap_dat = cap_dat.Substring(plus_index);
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                skip = true;  //if we can't find the + index then data is invalid so skip aquisition
-            }
-
-            //remove crap at the end
-
-            if (!skip)
-            {
-                int E_index = 0;
-                try
-                {
-                     E_index = cap_dat.IndexOf('E');
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    skip = true;
-                }
-
-                if (!skip)
-                {
-                    try
-                    {
-                        cap_dat = cap_dat.Remove(E_index + 5);
-                    }
-                    catch (IndexOutOfRangeException)
-                    {
-                        skip = true;
-                    }
-                }
-            }
-
-            if (!skip)
-            {
-                cap_dat = cap_dat + '\n';
-                data(cap_dat);
-            }
-            skip = false;
-            cap_dat = null;  
+        }
+        public void FileHandle(ref StreamWriter w)
+        {
+            writer = w;
         }
 
         //This is the main measurement loop
@@ -150,7 +117,10 @@ namespace Frequency_Counter_Capture
 
             string[] captured_data = null;
             string captured_data_ = "";
-            //check if we have a valid counder
+            
+
+
+            
 
             lock (lockthis)
             {
@@ -178,21 +148,25 @@ namespace Frequency_Counter_Capture
 
                                 captured_data = new string[num_100ms];
                                 data("\n0.1s\n");
+                                writer.WriteLine("\n0.1s\n");
                                 start_time = Environment.TickCount;
                                 tick_count = 0;
 
                                 for (int k = 0; k < num_100ms; k++)
                                 {
                                     capture(ref captured_data_);
+                                    data(captured_data_);
+                                    writer.Write(captured_data_);
                                 }
 
                                 tick_count = Environment.TickCount;
                                 data("Ellapsed time: " + ((double)(tick_count - start_time) / 1000).ToString() + " s\n");
                                 break;
-
+                                
                             case (int)frequency_counter_gate_time._1000ms:
 
                                 data("\n1s\n");
+                                writer.WriteLine("\n1s\n");
                                 captured_data = new string[num_1000ms];
 
                                 start_time = Environment.TickCount;
@@ -201,7 +175,8 @@ namespace Frequency_Counter_Capture
                                 for (int k = 0; k < num_1000ms; k++)
                                 {
                                     capture(ref captured_data_);
-
+                                    data(captured_data_);
+                                    writer.Write(captured_data_);
                                 }
 
                                 tick_count = Environment.TickCount;
@@ -211,6 +186,7 @@ namespace Frequency_Counter_Capture
                             case (int)frequency_counter_gate_time._10000ms:
 
                                 data("\n10s\n");
+                                writer.WriteLine("\n10s\n");
                                 captured_data = new string[num_10000ms];
 
                                 start_time = Environment.TickCount;
@@ -218,17 +194,21 @@ namespace Frequency_Counter_Capture
                                 for (int k = 0; k < num_10000ms; k++)
                                 {
                                     capture(ref captured_data_);
-
+                                    data(captured_data_);
+                                    writer.Write(captured_data_);
                                 }
+                                
                                 tick_count = Environment.TickCount;
                                 data("Ellapsed time: " + ((double)(tick_count - start_time) / 1000).ToString() + " s\n");
                                 break;
-
                         }
                     }
                 }
             }
             data("END");
+            writer.WriteLine("END");
+            writer.Close();
+            writer.Dispose();
         }
     }
 }

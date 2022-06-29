@@ -6,12 +6,14 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
+using System.IO;
+using Ivi.Visa.Interop;
 //*****************************************************************************
-// Written By: Chris Young 6 May 2009
+// Written By: Chris Young 21 June 2022
 // Counter software to aquire data from HP frequency counters 53132A
 // To add another counter extend the counter base class and implement the abstract methods
 // 
-// Revision 1: Both counters read okay but the newer HP53132A reads faster.
+// Revision 1: HP53132A.
 //*****************************************************************************
 
 namespace Frequency_Counter_Capture
@@ -45,6 +47,7 @@ namespace Frequency_Counter_Capture
         public string result;
         const int winPictureBox = 2016002;
         const int winCommandButton = 2007557;
+ 
 
         private HP53132A hp53132a;
 
@@ -60,11 +63,10 @@ namespace Frequency_Counter_Capture
             InitializeSettings();
 
             //set up raw counter objects
-            hp53132a = new HP53132A(20, "GPIB0");
+            hp53132a = new HP53132A(12, "GPIB4");
 
             //give the counter some defaults
             hp53132a.setUpCounter(frequency_counter_channel.CH1, frequency_counter_gate_time._100ms);
-
         }
         /// <summary>
         /// Initializes settings upon startup
@@ -98,20 +100,21 @@ namespace Frequency_Counter_Capture
             num_1000ms = (long)numericUpDown2.Value;
             num_10000ms = (long)numericUpDown3.Value;
 
+            StreamWriter writer = null;
+            SaveFileDialog save = new SaveFileDialog();
+            save.FileName = "DefaultOutputName.txt";
+            save.Filter = "Text File | *.txt";
 
+            if (save.ShowDialog() == DialogResult.OK) writer = new StreamWriter(save.OpenFile());
 
+            go_go.FileHandle(ref writer);
 
             //clear the data window. 
             data_window.Clear();
             measurement_thread = new Thread(new ThreadStart(go_go.runMeasurement));
             measurement_thread.Start();
             buttonSendCmd.Enabled = false;
-
-
-
         }
-
-
 
         private void HP53132_address_set_Click(object sender, EventArgs e)
         {
@@ -158,68 +161,18 @@ namespace Frequency_Counter_Capture
             }
         }
 
-
-
-
-        private void runMeasurementThread_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (DataFileWriter.Checked)
-            {
-                System.IO.Stream myStream;
-                SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-
-                saveFileDialog1.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
-                saveFileDialog1.FilterIndex = 2;
-                saveFileDialog1.RestoreDirectory = true;
-
-                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    if ((myStream = saveFileDialog1.OpenFile()) != null)
-                    {
-                        data_window.SaveFile(myStream, RichTextBoxStreamType.PlainText);
-                        myStream.Close();
-                    }
-                }
-
-
-            }
-        }
-
         private void showFrequencies(string frequency)
         {
             if (this.InvokeRequired == false)
-            {
-
-
+            { 
                 if (frequency.Equals("END"))
                 {
                     //the thread has finished its execution terminate it and save what we have
                     //abort the thread that was used to run the measurent
                     measurement_thread.Abort();
                     buttonSendCmd.Enabled = true;
-                    //if saving checked then save what we have.
-                    if (DataFileWriter.Checked)
-                    {
-                        System.IO.Stream myStream;
-                        SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-
-                        saveFileDialog1.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
-                        saveFileDialog1.FilterIndex = 2;
-                        saveFileDialog1.RestoreDirectory = true;
-
-                        if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                        {
-                            if ((myStream = saveFileDialog1.OpenFile()) != null)
-                            {
-                                data_window.SaveFile(myStream, RichTextBoxStreamType.PlainText);
-                                myStream.Close();
-                            }
-                        }
-
-
-                    }
-
-
+                   
+                   
                 }
                 else
                 {
@@ -275,7 +228,9 @@ namespace Frequency_Counter_Capture
             System.Environment.Exit(1);
         }
 
-
-
+        private void expectedFrequency_ValueChanged(object sender, EventArgs e)
+        {
+            
+        }
     }
 }

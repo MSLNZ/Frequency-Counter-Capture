@@ -51,7 +51,7 @@
             this.data_window = new System.Windows.Forms.RichTextBox();
             this.Frequency_Counter_GB = new System.Windows.Forms.GroupBox();
             this.Data_File_Writer = new System.Windows.Forms.SaveFileDialog();
-            //this.groupBox3.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -99,7 +99,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(23, 120);
+            this.label3.Location = new System.Drawing.Point(23, 122);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(76, 13);
             this.label3.TabIndex = 8;
@@ -108,7 +108,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(23, 79);
+            this.label2.Location = new System.Drawing.Point(23, 96);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(70, 13);
             this.label2.TabIndex = 7;
@@ -117,7 +117,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(23, 39);
+            this.label1.Location = new System.Drawing.Point(23, 66);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(79, 13);
             this.label1.TabIndex = 6;
@@ -125,7 +125,7 @@
             // 
             // numericUpDown3
             // 
-            this.numericUpDown3.Location = new System.Drawing.Point(105, 120);
+            this.numericUpDown3.Location = new System.Drawing.Point(165, 120);
             this.numericUpDown3.Maximum = new decimal(new int[] {
             100000,
             0,
@@ -143,7 +143,7 @@
             // 
             // numericUpDown2
             // 
-            this.numericUpDown2.Location = new System.Drawing.Point(105, 77);
+            this.numericUpDown2.Location = new System.Drawing.Point(165, 94);
             this.numericUpDown2.Maximum = new decimal(new int[] {
             100000,
             0,
@@ -161,7 +161,7 @@
             // 
             // numericUpDown1
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(105, 37);
+            this.numericUpDown1.Location = new System.Drawing.Point(165, 64);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             100000,
             0,

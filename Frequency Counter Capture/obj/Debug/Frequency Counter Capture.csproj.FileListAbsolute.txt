@@ -9,3 +9,15 @@ C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\o
 C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.exe
 C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.pdb
 C:\Users\c.young\Documents\Frequency Counter Capture\Frequency Counter Capture\obj\Debug\Frequency_Counter_Capture.MainForm.resources
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.csproj.AssemblyReference.cache
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.csproj.SuggestedBindingRedirects.cache
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.exe
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.pdb
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\bin\Debug\Frequency Counter Capture.exe.config
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\bin\Debug\Frequency Counter Capture.exe
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\bin\Debug\Frequency Counter Capture.pdb
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.csproj.ResolveComReference.cache
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\obj\Debug\Frequency_Counter_Capture.MainForm.resources
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\obj\Debug\Frequency_Counter_Capture.Properties.Resources.resources
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.csproj.GenerateResource.cache
+C:\Users\Administrator\Documents\GitHub\Frequency-Counter-Capture\Frequency Counter Capture\obj\Debug\Frequency Counter Capture.csproj.CoreCompileInputs.cache

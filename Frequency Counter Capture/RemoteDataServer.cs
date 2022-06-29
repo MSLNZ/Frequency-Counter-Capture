@@ -11,10 +11,13 @@ namespace Frequency_Counter_Capture
     /// <summary>
     /// A class to serve temperature data
     /// </summary>
-    public abstract class GPIBOverLANCommands
+    public class GPIBOverLANCommands:IEventHandler
     {
         private FormattedIO488 ioDmm;
-        //private ITcpipInstr iodss;
+        private IEventManager ioEventManager;
+        private IEventHandler handler;
+        
+
         private string error_status;
         protected int GPIB_adr = 0;
         protected string SICL_interface_id = "";
@@ -45,13 +48,16 @@ namespace Frequency_Counter_Capture
             try
             {
 
+
                 //create the resource manager and open a session with the instrument specified on txtAddress
                 ResourceManager grm = new ResourceManager();
-
-                
                 ioDmm.IO = (IMessage)grm.Open(sendstring, AccessMode.SHARED_LOCK, 2000, "");
-                
-                
+                ioDmm.IO.Timeout = 20000;
+                // set ioEventManager to the session and Enable the ioEventManager
+                ioEventManager = (IEventManager)ioDmm.IO;
+                ioEventManager.InstallHandler(EventType.EVENT_SERVICE_REQ, this, 0, 0);
+                ioEventManager.EnableEvent(EventType.EVENT_SERVICE_REQ, EventMechanism.EVENT_HNDLR, 0);
+
             }
             catch (SystemException ex)
             {
@@ -62,6 +68,9 @@ namespace Frequency_Counter_Capture
             error_status = "No Error";
 
         }
+
+        
+
 
         protected void CloseConnection()
         {
@@ -89,6 +98,17 @@ namespace Frequency_Counter_Capture
             return idn_value;
         }
 
+        public void HandleEvent(IEventManager vi, IEvent @event, int userHandle)
+        {
+            string response = "";
+            // TODO:  Add SRQEvent.HandleEvent implementation
+            sendcommand(":CALC3:AVERAGE:ALL?");
+            ReadResponse(ref response);
+
+
+
+        }
+
         protected void sendcommand(string command)
         {
             //Gets the instrument model number
@@ -112,7 +132,9 @@ namespace Frequency_Counter_Capture
                         ioDmm = new FormattedIO488();
                         //create the resource manager and open a session with the instrument specified on txtAddress     
                         ResourceManager grm = new ResourceManager();
+                        
                         ioDmm.IO = (IMessage)grm.Open(ss, AccessMode.SHARED_LOCK, 2000, "");         //this is set to null if io is down and it triggers a com exception
+                        ioDmm.IO.Timeout = 20000;
                     }
 
                     catch (System.Runtime.InteropServices.COMException)
@@ -186,6 +208,7 @@ namespace Frequency_Counter_Capture
         {
             try
             {
+               
                 val = ioDmm.ReadString();
             }
             catch (System.Runtime.InteropServices.COMException)
@@ -198,4 +221,5 @@ namespace Frequency_Counter_Capture
             GPIB_adr = address;
         }
     }
+   
 }

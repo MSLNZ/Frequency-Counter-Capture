@@ -5,13 +5,17 @@ using System.Text;
 
 namespace Frequency_Counter_Capture
 {
+    
     class HP53132A : Counter
     {
+        private bool frequency_set;
 
         public HP53132A(int GPIB_Address_, string SICL_) : base(GPIB_Address_, SICL_)
         {
-            string init_string = String.Concat(SICL_interface_id, Convert.ToString(GPIB_adr));
+            string init_string = String.Concat(SICL_interface_id,"::", Convert.ToString(GPIB_adr));
             InitIO(init_string);
+            frequency_set = false;
+            
 
         }
 
@@ -20,19 +24,24 @@ namespace Frequency_Counter_Capture
         {
             string str_channel = "";
             string str_gate = "";
+            string exp_freq = "";
             channel = ch;
+            string c = "";
             gate_time = gate_t;
 
             switch (channel)     
             {
                 case frequency_counter_channel.CH1:
                     str_channel = ":FUNC 'FREQ 1'";
+                    c = "1";
                     break;
                 case frequency_counter_channel.CH2:
-                    str_channel = ":FUNC 'FREQ 2'"; ;
+                    str_channel = ":FUNC 'FREQ 2'";
+                    c = "2";
                     break;
                 case frequency_counter_channel.CH3:
-                    str_channel = ":FUNC 'FREQ 3'"; ;
+                    str_channel = ":FUNC 'FREQ 3'";
+                    c = "3";
                     break;
                 default: str_channel = ":FUNC 'FREQ 1'";
                     break;        
@@ -54,32 +63,66 @@ namespace Frequency_Counter_Capture
                     break;  
             }
 
+            if (!frequency_set)
+            {
+                sendcommand("*RST");
+                sendcommand("*CLS");
+                sendcommand("*SRE 0");
+                sendcommand("*ESE 0");
+                sendcommand(":STAT:PRES");
+                sendcommand(":FORMAT ASCII");
+            }
+            sendcommand(str_channel);
+            sendcommand(":EVENT1:LEVEL 0");
+            sendcommand(":FREQ:ARM:STAR:SOUR IMM");
+            sendcommand(str_gate);
+            sendcommand(":ROSC:SOUR INT");
+            sendcommand(":DIAG:CAL:INT:AUTO OFF");
+            sendcommand(":CALC:MATH:STATE OFF");
+            sendcommand(":CALC2:LIM:STATE OFF");
+            sendcommand(":CALC3:AVER:STATE OFF");
+            sendcommand(":HCOPY:CONT OFF");
+            sendcommand(":DISP:ENAB OFF");
+            sendcommand("*DDT #15FETC?");
             
-            sendcommand("*RST\r\n");
-            sendcommand("*CLS\r\n");
-            sendcommand("*SRE 0\r\n");
-            sendcommand("*ESE 0\r\n");
-            sendcommand(":STAT:PRES\r\n");
-            sendcommand(":FORMAT ASCII\r\n");
-            sendcommand(str_channel+"\r\n");
-            sendcommand(":EVENT1:LEVEL 0\r\n");
-            sendcommand(":FREQ:ARM:STAR:SOUR IMM\r\n");
-            sendcommand(str_gate+ "\r\n");
-            sendcommand(":ROSC:SOUR INT\r\n");
-            sendcommand(":DIAG:CAL:INT:AUTO OFF\r\n");
-            sendcommand(":CALC:MATH:STATE OFF\r\n");
-            sendcommand(":CALC2:LIM:STATE OFF\r\n");
-            sendcommand(":CALC3:AVER:STATE OFF\r\n");
-            sendcommand(":HCOPY:CONT OFF\r\n");
-            sendcommand(":DISP:ENAB OFF\r\n");
-            sendcommand("*DDT #15FETC?\r\n");
-            sendcommand(":INIT:CONT ON\r\n");
+
+            if (!frequency_set)
+            {
+                frequency_set = true;
+                sendcommand("READ:FREQUENCY?");
+                string data = "";
+                ReadResponse(ref data);
+                sendcommand(":FREQ:EXP" + "1 " + data);
+            }
+            sendcommand(":INIT:CONT ON");
+
         }
 
         public override void doCapture(ref string captured_data)
         {
-            sendcommand("FETC?\r\n");
+
+
+            //sendcommand("FETC?");
+            sendcommand("FETC?");
             ReadResponse(ref captured_data);
+            //string num_command = ":CALC3:AVERAGE:COUNT " + num.ToString();
+            //string data = "";
+            //sendcommand("*SRE 0");
+            //sendcommand("*CLS"); //clear the status byte register
+            //sendcommand(":CALC3:AVERAGE ON");
+            //sendcommand(num_command);
+            //sendcommand(":TRIG:COUNT:AUTO ON");
+            //sendcommand("*ESE 1"); //enable status register summary bit (ESB) to assert when the operation complete (OPC) bit in the standard event status register is asserted 
+            //sendcommand("*SRE 32"); //assert SRQ GPIB interupt when summary bit (ESB) is asserted in the status byte register
+
+            //sendcommand(":INIT;*OPC");
+            //sendcommand("*ESR?");
+            //ReadResponse(ref data);
+
+
+
+
+
         }
 
         public void setCounterAddress(string address)
@@ -88,4 +131,5 @@ namespace Frequency_Counter_Capture
         }
 
     }
+    
 }
