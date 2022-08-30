@@ -76,7 +76,8 @@ namespace Frequency_Counter_Capture
             sendcommand(":EVENT1:LEVEL 0");
             sendcommand(":FREQ:ARM:STAR:SOUR IMM");
             sendcommand(str_gate);
-            sendcommand(":ROSC:SOUR INT");
+            sendcommand(":ROSC:SOUR EXT"); //we feed an external 10MHz source into the back of the counter
+            sendcommand(":ROSC: EXT: CHECK OFF");
             sendcommand(":DIAG:CAL:INT:AUTO OFF");
             sendcommand(":CALC:MATH:STATE OFF");
             sendcommand(":CALC2:LIM:STATE OFF");
