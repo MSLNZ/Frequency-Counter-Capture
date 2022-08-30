@@ -146,7 +146,7 @@ namespace Frequency_Counter_Capture
 
                             case (int)frequency_counter_gate_time._100ms:
 
-                                captured_data = new string[num_100ms];
+                                //captured_data = new string[num_100ms];
                                 data("\n0.1s\n");
                                 writer.WriteLine("\n0.1s\n");
                                 start_time = Environment.TickCount;
@@ -156,7 +156,8 @@ namespace Frequency_Counter_Capture
                                 {
                                     capture(ref captured_data_);
                                     data(captured_data_);
-                                    writer.Write(captured_data_);
+                                    string writestring = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "'" + captured_data_;
+                                    writer.Write(writestring);
                                 }
 
                                 tick_count = Environment.TickCount;
@@ -167,7 +168,7 @@ namespace Frequency_Counter_Capture
 
                                 data("\n1s\n");
                                 writer.WriteLine("\n1s\n");
-                                captured_data = new string[num_1000ms];
+                                //captured_data = new string[num_1000ms];
 
                                 start_time = Environment.TickCount;
                                 tick_count = 0;
@@ -176,7 +177,8 @@ namespace Frequency_Counter_Capture
                                 {
                                     capture(ref captured_data_);
                                     data(captured_data_);
-                                    writer.Write(captured_data_);
+                                    string writestring = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "'" + captured_data_;
+                                    writer.Write(writestring);
                                 }
 
                                 tick_count = Environment.TickCount;
@@ -187,7 +189,7 @@ namespace Frequency_Counter_Capture
 
                                 data("\n10s\n");
                                 writer.WriteLine("\n10s\n");
-                                captured_data = new string[num_10000ms];
+                                //captured_data = new string[num_10000ms];
 
                                 start_time = Environment.TickCount;
                                 tick_count = 0;
@@ -195,7 +197,8 @@ namespace Frequency_Counter_Capture
                                 {
                                     capture(ref captured_data_);
                                     data(captured_data_);
-                                    writer.Write(captured_data_);
+                                    string writestring = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "'" + captured_data_;
+                                    writer.Write(writestring);
                                 }
                                 
                                 tick_count = Environment.TickCount;
