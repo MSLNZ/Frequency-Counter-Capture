@@ -208,7 +208,7 @@ namespace Frequency_Counter_Capture
         {
             try
             {
-               
+                
                 val = ioDmm.ReadString();
             }
             catch (System.Runtime.InteropServices.COMException)
