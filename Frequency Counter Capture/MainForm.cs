@@ -7,18 +7,17 @@ using System.Text;
 using System.Windows.Forms;
 using System.Threading;
 using System.IO;
-using Ivi.Visa.Interop;
 //*****************************************************************************
 // Written By: Chris Young 21 June 2022
-// Counter software to aquire data from HP frequency counters 53132A
+// Counter software to aquire data from Keysight frequency counters 53210A
 // To add another counter extend the counter base class and implement the abstract methods
 // 
-// Revision 1: HP53132A.
+// Revision 1: Keysight53210A.
 //*****************************************************************************
 
 namespace Frequency_Counter_Capture
 {
-    public enum frequency_counter_type { HP_53132A };
+    public enum frequency_counter_type { Keysight_53210A };
     public enum frequency_counter_channel { CH1, CH2, CH3 };
     public enum frequency_counter_gate_time { _100ms, _1000ms, _10000ms };
     public delegate void PrintFrequencies(string str);
@@ -47,9 +46,13 @@ namespace Frequency_Counter_Capture
         public string result;
         const int winPictureBox = 2016002;
         const int winCommandButton = 2007557;
+        public bool ch1_checked_state = true;
+        public bool ch2_checked_state = false;
+        public bool ch3_checked_state = false;
  
 
-        private HP53132A hp53132a;
+        private Keysight53210A keysight53210a;
+        
 
         Measurement go_go;
 
@@ -62,11 +65,22 @@ namespace Frequency_Counter_Capture
             InitializeComponent();
             InitializeSettings();
 
-            //set up raw counter objects
-            hp53132a = new HP53132A(12, "GPIB4");
+            
+            keysight53210a = new Keysight53210A();
 
             //give the counter some defaults
-            hp53132a.setUpCounter(frequency_counter_channel.CH1, frequency_counter_gate_time._100ms);
+            keysight53210a.setUpCounter(frequency_counter_channel.CH1, frequency_counter_gate_time._100ms);
+
+            //create a measurement and its measurement thread
+            go_go = new Measurement(ref keysight53210a, ref printer);
+
+            //give the current values back to the measurement.
+            go_go.num100 = (long)numericUpDown1.Value;
+            go_go.num1000 = (long)numericUpDown2.Value;
+            go_go.num10000 = (long)numericUpDown3.Value;
+
+            buttonSendCmd.Enabled = true;
+            Cancel_Measurement.Enabled = true;
         }
         /// <summary>
         /// Initializes settings upon startup
@@ -75,16 +89,12 @@ namespace Frequency_Counter_Capture
         {
             short v;
             string Rev;
-            Rev = "\n\nRevised 21-06-2022\n";
+            Rev = "\n\nRevised 21-08-2023\n";
             data_window.AppendText(Rev);
-
-            textBoxError.Text = "";
             buttonSendCmd.Enabled = false;
-            HP53132A_GB.Enabled = true;
+            Keysight53210A_GB.Enabled = true;
             Cancel_Measurement.Enabled = false;
             Frequency_Counter_GB.Enabled = true;
-            textBoxError.Visible = true;
-           
             printer = new PrintFrequencies(showFrequencies);  //invokes the gui to print data to the rich text box
         }
 
@@ -114,25 +124,6 @@ namespace Frequency_Counter_Capture
             measurement_thread = new Thread(new ThreadStart(go_go.runMeasurement));
             measurement_thread.Start();
             buttonSendCmd.Enabled = false;
-        }
-
-        private void HP53132_address_set_Click(object sender, EventArgs e)
-        {
-
-            hp53132a.setCounterAddress(HP53132_address_box.Text);
-
-            //create a measurement and its measurement thread
-            go_go = new Measurement(ref hp53132a, ref printer);
-
-            //give the current values back to the measurement.
-            go_go.num100 = (long)numericUpDown1.Value;
-            go_go.num1000 = (long)numericUpDown2.Value;
-            go_go.num10000 = (long)numericUpDown3.Value;
-
-            buttonSendCmd.Enabled = true;
-            Cancel_Measurement.Enabled = true;
-
-
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
@@ -187,18 +178,33 @@ namespace Frequency_Counter_Capture
             }
         }
 
-        private void HP53132A_CH1_CheckedChanged(object sender, EventArgs e)
+        private void Keysight53210A_CH1_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (Keysight53210A_CH1.Checked == true)
+            {
+                keysight53210a.Channel = frequency_counter_channel.CH1;
+                if (ch2_checked_state == true) Keysight53210A_CH2.Checked = false;
+                if (ch3_checked_state == true) Keysight53210A_CH3.Checked = false;
+            }
 
         }
-        private void HP53132A_CH3_CheckedChanged(object sender, EventArgs e)
+        private void Keysight53210A_CH3_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (Keysight53210A_CH2.Checked == true)
+            {
+                keysight53210a.Channel = frequency_counter_channel.CH2;
+                if (ch1_checked_state == true) Keysight53210A_CH1.Checked = false;
+                if (ch3_checked_state == true) Keysight53210A_CH3.Checked = false;
+            }
         }
-        private void HP53132A_CH2_CheckedChanged(object sender, EventArgs e)
+        private void Keysight53210A_CH2_CheckedChanged(object sender, EventArgs e)
         {
-
+            if (Keysight53210A_CH3.Checked == true)
+            {
+                keysight53210a.Channel = frequency_counter_channel.CH3;
+                if (ch1_checked_state == true) Keysight53210A_CH1.Checked = false;
+                if (ch2_checked_state == true) Keysight53210A_CH2.Checked = false;
+            }
         }
 
         private void Cancel_Measurement_Click(object sender, EventArgs e)
@@ -220,17 +226,6 @@ namespace Frequency_Counter_Capture
             go_go.num10000 = (long)numericUpDown3.Value;
             buttonSendCmd.Enabled = true;
 
-        }
-
-        private void buttonExit_Click(object sender, EventArgs e)
-        {
-            //need proper shutdown (this is not right)
-            System.Environment.Exit(1);
-        }
-
-        private void expectedFrequency_ValueChanged(object sender, EventArgs e)
-        {
-            
         }
     }
 }

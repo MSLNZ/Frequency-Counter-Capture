@@ -11,7 +11,7 @@ namespace Frequency_Counter_Capture
     {
         //public ICSconstants ICSconts;
         private PrintFrequencies data;
-        public HP53132A hp53132a;
+        public Keysight53210A keysight_53210a;
         private long num_100ms = 10000;
         private long num_1000ms = 1000;
         private long num_10000ms = 100;
@@ -28,10 +28,10 @@ namespace Frequency_Counter_Capture
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public Measurement(ref HP53132A frequency_counter, ref PrintFrequencies print_)
+        public Measurement(ref Keysight53210A frequency_counter, ref PrintFrequencies print_)
         {
             data = print_;
-            hp53132a = frequency_counter;
+            keysight_53210a = frequency_counter;
             encoding = new ASCIIEncoding();
 
         }
@@ -99,9 +99,9 @@ namespace Frequency_Counter_Capture
             }
                 
         }
-        public void capture(ref string cap_dat)
+        public void capture(ref double[] cap_dat,long sample_count)
         {
-            hp53132a.doCapture(ref cap_dat);
+            keysight_53210a.doCapture(ref cap_dat, sample_count);
 
         }
         public void FileHandle(ref StreamWriter w)
@@ -115,93 +115,131 @@ namespace Frequency_Counter_Capture
             long tick_count = 0;
             long start_time = 0;
 
-            string[] captured_data = null;
-            string captured_data_ = "";
-            
+            //string[] captured_data = null;
+            double[] captured_data_ = null;
+            StringBuilder printstring = new StringBuilder();
+            string sendstr = "";
 
 
-            
+
+
 
             lock (lockthis)
             {
-                if (hp53132a != null)
+                if (keysight_53210a != null)
                 {
 
                     for (int i = 0; i < 3; i++)
                     {
-                        if (hp53132a.Channel == frequency_counter_channel.CH1)
+                        if (keysight_53210a.Channel == frequency_counter_channel.CH1)
                         {
-                            hp53132a.setUpCounter(frequency_counter_channel.CH1, (frequency_counter_gate_time)i);
+                            keysight_53210a.setUpCounter(frequency_counter_channel.CH1, (frequency_counter_gate_time)i);
                         }
-                        else if (hp53132a.Channel == frequency_counter_channel.CH2)
+                        else if (keysight_53210a.Channel == frequency_counter_channel.CH2)
                         {
-                            hp53132a.setUpCounter(frequency_counter_channel.CH2, (frequency_counter_gate_time)i);
+                            keysight_53210a.setUpCounter(frequency_counter_channel.CH2, (frequency_counter_gate_time)i);
                         }
-                        else if (hp53132a.Channel == frequency_counter_channel.CH3)
+                        else if (keysight_53210a.Channel == frequency_counter_channel.CH3)
                         {
-                            hp53132a.setUpCounter(frequency_counter_channel.CH3, (frequency_counter_gate_time)i);
+                            keysight_53210a.setUpCounter(frequency_counter_channel.CH3, (frequency_counter_gate_time)i);
                         }
                         switch (i)
                         {
 
                             case (int)frequency_counter_gate_time._100ms:
 
-                                //captured_data = new string[num_100ms];
-                                data("\n0.1s\n");
-                                writer.WriteLine("\n0.1s\n");
+                            
+                                
+                                
                                 start_time = Environment.TickCount;
                                 tick_count = 0;
+                                capture(ref captured_data_, num_100ms);
+                                tick_count = Environment.TickCount;
+                                writer.WriteLine("\n0.1s\n");
+                                data("\n0.1s\n");
+                                string writestring = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                                writer.WriteLine(writestring);
 
-                                for (int k = 0; k < num_100ms; k++)
+                                foreach(double s in captured_data_)
                                 {
-                                    capture(ref captured_data_);
-                                    data(captured_data_);
-                                    string writestring = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "'" + captured_data_;
-                                    writer.Write(writestring);
+                                    writer.WriteLine(s.ToString());
                                 }
 
-                                tick_count = Environment.TickCount;
+                                
+                                foreach (double s in captured_data_)
+                                {
+                                    printstring.AppendLine(s.ToString());
+                                }
+                                sendstr = printstring.ToString();
+                                printstring = null;
+                                data(sendstr);
+
+
+                                
                                 data("Ellapsed time: " + ((double)(tick_count - start_time) / 1000).ToString() + " s\n");
                                 break;
                                 
                             case (int)frequency_counter_gate_time._1000ms:
 
-                                data("\n1s\n");
-                                writer.WriteLine("\n1s\n");
-                                //captured_data = new string[num_1000ms];
-
                                 start_time = Environment.TickCount;
                                 tick_count = 0;
+                                printstring = new StringBuilder();
+                               
+                                capture(ref captured_data_, num_1000ms);
+                                tick_count = Environment.TickCount;
+                                writer.WriteLine("\n1s\n");
+                                data("\n1s\n");
+                                writestring = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                                writer.WriteLine(writestring);
 
-                                for (int k = 0; k < num_1000ms; k++)
+                                foreach (double s in captured_data_)
                                 {
-                                    capture(ref captured_data_);
-                                    data(captured_data_);
-                                    string writestring = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "'" + captured_data_;
-                                    writer.Write(writestring);
+                                    writer.WriteLine(s.ToString());
                                 }
 
-                                tick_count = Environment.TickCount;
+
+                                foreach (double s in captured_data_)
+                                {
+                                    printstring.AppendLine(s.ToString());
+                                }
+                                sendstr = printstring.ToString();
+                                printstring = null;
+                                data(sendstr);
+
+                                
                                 data("Ellapsed time: " + ((double)(tick_count - start_time) / 1000).ToString() + " s\n");
 
                                 break;
                             case (int)frequency_counter_gate_time._10000ms:
 
-                                data("\n10s\n");
-                                writer.WriteLine("\n10s\n");
-                                //captured_data = new string[num_10000ms];
+                               
+                   
 
                                 start_time = Environment.TickCount;
                                 tick_count = 0;
-                                for (int k = 0; k < num_10000ms; k++)
-                                {
-                                    capture(ref captured_data_);
-                                    data(captured_data_);
-                                    string writestring = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") + "'" + captured_data_;
-                                    writer.Write(writestring);
-                                }
-                                
+                                printstring = new StringBuilder();
+
+                                capture(ref captured_data_, num_10000ms);
                                 tick_count = Environment.TickCount;
+                                data("\n10s\n");
+                                writer.WriteLine("\n10s\n");
+                                writestring = System.DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                                writer.WriteLine(writestring);
+                                foreach (double s in captured_data_)
+                                {
+                                    writer.WriteLine(s.ToString());
+                                }
+
+
+                                foreach (double s in captured_data_)
+                                {
+                                    printstring.AppendLine(s.ToString());
+                                }
+                                sendstr = printstring.ToString();
+                                printstring = null;
+                                data(sendstr);
+
+                                
                                 data("Ellapsed time: " + ((double)(tick_count - start_time) / 1000).ToString() + " s\n");
                                 break;
                         }
