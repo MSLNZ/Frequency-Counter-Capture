@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net.Sockets;
+using System.Windows.Forms;
 using System.IO;
 
 namespace Frequency_Counter_Capture
@@ -67,7 +68,7 @@ namespace Frequency_Counter_Capture
             }
             catch (IOException)
             {
-                Console.Error.WriteLine("Timeout.");
+                MessageBox.Show("Cannot read frequency information.  Check you have a valid signal and the 10MHz external reference is connected to the back of the counter appropriately");
                 Environment.Exit(-1);
             }
 
@@ -164,7 +165,7 @@ namespace Frequency_Counter_Capture
 
             WriteString("SENS:ROSC:SOUR EXT"); //select external clock
             WriteString("SENS:ROSC:EXT:FREQ 10E6");
-
+            
 
             WriteString("CONF:FREQ 10E6, (@" + c.ToString() + ")");
             WriteString("SAMP:COUN 1");
@@ -172,13 +173,15 @@ namespace Frequency_Counter_Capture
             ns.ReadTimeout = gt + 1000; //allow an extra second
             double[] res = GetReadings();  //get the actual frequency of the signal, we need this as it has an effect on the accuracy of the measurement.
             measured_frequency = res[0].ToString();
+
         }
 
-        public override void doCapture(ref double[] captured_data, long sample_count)
+        public override void doCapture(ref double[] captured_data, long sample_count, ref long start_t, ref long end_t)
         {
 
-
-            ns.ReadTimeout = (int) (sample_count * gt) + 100000;
+            if (sample_count == 0) return;
+            //ns.ReadTimeout = (int) (sample_count * gt) + 100000;
+            ns.ReadTimeout = System.Threading.Timeout.Infinite;//do not timeout 
             WriteString("*RST");
             WriteString("*CLS");
             WriteString("SYST:TIM INF"); //infinite timeout  wait forever for a response
@@ -189,14 +192,20 @@ namespace Frequency_Counter_Capture
             //configure the counter
             WriteString(conf_cmd);
             //sendcommand("TRIG:SOUR INT");
-            WriteString("TRIG:SLOP POS"); //trigger on the rising edge
+           
+            //WriteString("TRIG:SLOP POS"); //trigger on the rising edge
             WriteString("TRIG:COUN 1");
             WriteString("SAMP:COUN " + sample_count.ToString());
+            WriteString("SENS:FREQ:MODE CONT");
             WriteString(GateCommand); //set the gate time;
-            WriteString("SENS:FREQ:GATE:SOUR TIME"); //set the gate source
+            WriteString("CALC:STAT ON");
+            WriteString("CALC:AVER:STAT ON");
+            //WriteString("SENS:FREQ:GATE:SOUR TIME"); //set the gate source
+            
             WriteString("READ?");
-            double[] res = GetReadings();  //get the actual frequency of the signal, we need this as it has an effect on the accuracy of the measurement.
-
+            start_t = (long)System.Environment.TickCount;
+            double[] res = GetReadings();
+            end_t = (long)System.Environment.TickCount;
 
             captured_data = res;
 

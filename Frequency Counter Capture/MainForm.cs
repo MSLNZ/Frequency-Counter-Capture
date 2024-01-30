@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using System.Threading;
 using System.IO;
 //*****************************************************************************
-// Written By: Chris Young 21 June 2022
+// Written By: Chris Young 22 August 2023
 // Counter software to aquire data from Keysight frequency counters 53210A
 // To add another counter extend the counter base class and implement the abstract methods
 // 
@@ -76,8 +76,7 @@ namespace Frequency_Counter_Capture
 
             //give the current values back to the measurement.
             go_go.num100 = (long)numericUpDown1.Value;
-            go_go.num1000 = (long)numericUpDown2.Value;
-            go_go.num10000 = (long)numericUpDown3.Value;
+            
 
             buttonSendCmd.Enabled = true;
             Cancel_Measurement.Enabled = true;
@@ -107,8 +106,7 @@ namespace Frequency_Counter_Capture
         {
 
             num_100ms = (long)numericUpDown1.Value;
-            num_1000ms = (long)numericUpDown2.Value;
-            num_10000ms = (long)numericUpDown3.Value;
+           
 
             StreamWriter writer = null;
             SaveFileDialog save = new SaveFileDialog();
@@ -136,21 +134,8 @@ namespace Frequency_Counter_Capture
 
         }
 
-        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
-        {
-            if (go_go != null)
-            {
-                go_go.num1000 = ((long)numericUpDown2.Value);
-            }
-        }
+        
 
-        private void numericUpDown3_ValueChanged(object sender, EventArgs e)
-        {
-            if (go_go != null)
-            {
-                go_go.num10000 = ((long)numericUpDown3.Value);
-            }
-        }
 
         private void showFrequencies(string frequency)
         {
@@ -222,8 +207,6 @@ namespace Frequency_Counter_Capture
 
             //give the current values back to the measurement.
             go_go.num100 = (long)numericUpDown1.Value;
-            go_go.num1000 = (long)numericUpDown2.Value;
-            go_go.num10000 = (long)numericUpDown3.Value;
             buttonSendCmd.Enabled = true;
 
         }

@@ -45,7 +45,7 @@ namespace Frequency_Counter_Capture
 
         public abstract void setUpCounter(frequency_counter_channel ch, frequency_counter_gate_time t);       
        
-        public abstract void doCapture(ref double[] captured_data, long sample_count);
+        public abstract void doCapture(ref double[] captured_data, long sample_count, ref long start_t, ref long end_t);
 
     }
 }
